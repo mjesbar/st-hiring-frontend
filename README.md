@@ -1,6 +1,6 @@
 # Eventim Frontend Test
 
-Welcome to the Eventim frontend test for new hires (Senior Level). The purpose of this test is to build a React UI that integrates with the backend API, with ownership over testing and code quality.
+Welcome to the Eventim frontend test for new hires. The purpose of this test is to build a React UI that integrates with the backend API.
 
 ## Tech Stack
 
