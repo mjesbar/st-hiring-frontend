@@ -24,7 +24,7 @@ export function EventCard({ event }: EventCardProps) {
 
   return (
     <Card variant="outlined" sx={{ height: '100%' }}>
-      <CardContent>
+      <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <Typography variant="h6" component="h2" gutterBottom>
           {event.name}
         </Typography>
@@ -34,7 +34,7 @@ export function EventCard({ event }: EventCardProps) {
         <Typography variant="body2" sx={{ mb: 1 }}>
           {event.description}
         </Typography>
-        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+        <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 'auto', justifyContent: 'flex-end' }}>
           {ticketCounts.length === 0 ? (
             <Chip size="small" label="No tickets available" />
           ) : (
