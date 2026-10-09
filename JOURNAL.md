@@ -6,7 +6,7 @@
 
 - Pagination controls: `src/components/EventsPagination.tsx` renders an MUI `Pagination` plus a "Per page" `Select` (10, 20, 50, 100). Page and page size live in Redux (`src/states/eventsPaginationSlice.ts`) and are clamped client-side (`src/lib/pagination.ts`) so the backend never receives `pageSize > 100`.
 
-- Event cards: `src/components/EventCard.tsx` shows name, date, location and description, and groups the available tickets by type into one chip per distinct type (`General x3`, `VIP x1`). Events with no available tickets show a `No tickets available` fallback. `src/components/EventList.tsx` lays the cards out in a responsive MUI `Grid` (1/2/3 columns).
+- Event cards: `src/components/EventCard.tsx` shows name, date, location and description, and renders a single `Available xN` chip from the event's `availableTickets` count. Events with no available tickets show a `No tickets available` fallback. `src/components/EventList.tsx` lays the cards out in a responsive MUI `Grid` (1/2/3 columns).
 
 - Scrollable list with pinned pagination: `EventsPage` is a flex column where the list scrolls (`overflowY: auto`) and the pagination bar stays visible (`flexShrink: 0`). The app shell (`src/App.tsx`) uses `height: 100vh` so the scroll region is bounded.
 
@@ -22,23 +22,13 @@
 
 # Bugs
 
-- `clampPageSize(0)` returned the default instead of `1`: `Math.trunc(0) || DEFAULT_PAGE_SIZE` treats `0` as falsy. Fixed with an explicit `Number.isFinite` check in `src/lib/pagination.ts`.
-
-- `parseHeaderNumber` returned `0` for a missing header: `Number(null)` is `0`, which passed the `>= 0` guard. Fixed by returning the fallback when `headers.get()` is `null`.
-
-- Integration tests crashed with `Expected signal ("AbortSignal {}") to be an instance of AbortSignal`: jsdom provides its own `AbortSignal` while Node's `fetch`/`Request` (undici) rejects it. Fixed by switching the Vitest environment to `happy-dom`.
-
-- Vitest 5 failed to start against Vite 5 (`Package subpath './module-runner' is not defined`): Vitest 5 requires Vite 6. Pinned `vitest@^2.1.9`, which supports Vite 5.
-
-- `tsc -b` failed on `vite.config.ts` because the `test` key is not part of Vite's `defineConfig`. Moved the test config into a separate `vitest.config.ts` using `mergeConfig`.
-
 - `@testing-library/dom` was not installed automatically (Yarn 3 does not install peer deps), so `jest-dom` failed to import. Added it as a dev dependency.
 
 # Performance
 
 - Server state is cached by RTK Query per `(page, pageSize)` argument, so revisiting a page within `keepUnusedDataFor` (default 60s) renders from cache without a new request.
 
-- Ticket grouping is a single O(n) pass over `availableTickets` using a `Map`, preserving first-seen order.
+- The events list no longer requests the ticket array: the backend returns the three status counts by default, so the card renders from scalars instead of grouping a ticket list client-side.
 
 - `pageSize` is clamped to `MAX_PAGE_SIZE` (100) before the request, avoiding a guaranteed `500` from the backend.
 
