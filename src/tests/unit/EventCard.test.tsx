@@ -2,17 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { screen } from '@testing-library/react'
 import { renderWithProviders } from '../utils/renderWithProviders'
 import { EventCard } from '../../components/EventCard'
-import type { Event, Ticket } from '../../lib/types'
-
-const ticket = (id: number, type: string): Ticket => ({
-  id,
-  eventId: 1,
-  type,
-  status: 'available',
-  price: 50,
-  createdAt: '',
-  updatedAt: '',
-})
+import type { Event } from '../../lib/types'
 
 const event: Event = {
   id: 1,
@@ -20,7 +10,9 @@ const event: Event = {
   date: '2026-05-01T20:00:00.000Z',
   location: 'Madrid',
   description: 'A great show',
-  availableTickets: [ticket(10, 'VIP')],
+  availableTickets: 3,
+  soldTickets: 1,
+  reservedTickets: 0,
   createdAt: '',
   updatedAt: '',
 }
@@ -33,16 +25,15 @@ describe('EventCard', () => {
     expect(screen.getByText('A great show')).toBeInTheDocument()
   })
 
-  it('renders one chip per distinct ticket type with its count', () => {
-    const tickets = [ticket(1, 'General'), ticket(2, 'General'), ticket(3, 'General'), ticket(4, 'VIP')]
-    renderWithProviders(<EventCard event={{ ...event, availableTickets: tickets }} />)
-    expect(screen.getByText('General x3')).toBeInTheDocument()
-    expect(screen.getByText('VIP x1')).toBeInTheDocument()
-    expect(screen.queryByText('General x1')).not.toBeInTheDocument()
+  it('renders only the available chip', () => {
+    renderWithProviders(<EventCard event={event} />)
+    expect(screen.getByText('Available x3')).toBeInTheDocument()
+    expect(screen.queryByText(/Sold/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/Reserved/)).not.toBeInTheDocument()
   })
 
-  it('shows a fallback when there are no tickets', () => {
-    renderWithProviders(<EventCard event={{ ...event, availableTickets: [] }} />)
+  it('shows a fallback when there are no available tickets', () => {
+    renderWithProviders(<EventCard event={{ ...event, availableTickets: 0 }} />)
     expect(screen.getByText('No tickets available')).toBeInTheDocument()
   })
 })
