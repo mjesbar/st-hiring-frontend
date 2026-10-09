@@ -1,4 +1,4 @@
-export type TicketStatus = 'available' | 'unavailable'
+export type TicketStatus = 'available' | 'sold' | 'reserved'
 
 export interface Ticket {
   id: number
@@ -16,7 +16,10 @@ export interface Event {
   date: string
   location: string
   description: string
-  availableTickets: Ticket[]
+  availableTickets: number
+  soldTickets: number
+  reservedTickets: number
+  tickets?: Ticket[]
   createdAt: string
   updatedAt: string
 }

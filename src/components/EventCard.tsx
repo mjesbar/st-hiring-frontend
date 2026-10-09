@@ -1,5 +1,5 @@
 import { Card, CardContent, Chip, Stack, Typography } from '@mui/material'
-import type { Event, Ticket } from '../lib/types'
+import type { Event } from '../lib/types'
 
 interface EventCardProps {
   event: Event
@@ -10,18 +10,7 @@ const formatDate = (value: string): string => {
   return Number.isNaN(date.getTime()) ? value : date.toLocaleString()
 }
 
-/** Counts available tickets per type, preserving first-seen order. */
-const countTicketsByType = (tickets: Ticket[]): Array<{ type: string; count: number }> => {
-  const counts = new Map<string, number>()
-  for (const ticket of tickets) {
-    counts.set(ticket.type, (counts.get(ticket.type) ?? 0) + 1)
-  }
-  return Array.from(counts, ([type, count]) => ({ type, count }))
-}
-
 export function EventCard({ event }: EventCardProps) {
-  const ticketCounts = countTicketsByType(event.availableTickets)
-
   return (
     <Card variant="outlined" sx={{ height: '100%' }}>
       <CardContent sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -35,12 +24,10 @@ export function EventCard({ event }: EventCardProps) {
           {event.description}
         </Typography>
         <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 'auto', justifyContent: 'flex-end' }}>
-          {ticketCounts.length === 0 ? (
-            <Chip size="small" label="No tickets available" />
+          {event.availableTickets > 0 ? (
+            <Chip size="small" color="primary" label={`Available x${event.availableTickets}`} />
           ) : (
-            ticketCounts.map(({ type, count }) => (
-              <Chip key={type} size="small" color="primary" label={`${type} x${count}`} />
-            ))
+            <Chip size="small" label="No tickets available" />
           )}
         </Stack>
       </CardContent>
